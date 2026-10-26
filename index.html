@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E8730C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CG PULSE">
+<meta name="description" content="CG PULSE — organização diária do secretariado hospitalar, 100% local e offline.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>CG PULSE</title>
+<style>
+:root{
+  --bg:#F3F5F7;--card:#FFFFFF;--text:#1A2230;--muted:#667085;--line:#E1E5EA;--soft:#EEF1F4;
+  --accent:#E8730C;--accent-soft:#FDEEDF;--on-accent:#FFFFFF;
+  --red:#D23B2E;--red-bg:#FCEBE9;--amb:#C88700;--amb-bg:#FFF4D6;--grn:#1F8A43;--grn-bg:#E6F4EA;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F141B;--card:#18202A;--text:#E8EDF3;--muted:#98A2B3;--line:#2A3441;--soft:#212A35;
+    --accent:#F08A2E;--accent-soft:#3A2614;--on-accent:#1A1206;
+    --red:#EF5A4C;--red-bg:#3A1C19;--amb:#E5A823;--amb-bg:#3A2E10;--grn:#3DB565;--grn-bg:#15301E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F141B;--card:#18202A;--text:#E8EDF3;--muted:#98A2B3;--line:#2A3441;--soft:#212A35;
+  --accent:#F08A2E;--accent-soft:#3A2614;--on-accent:#1A1206;
+  --red:#EF5A4C;--red-bg:#3A1C19;--amb:#E5A823;--amb-bg:#3A2E10;--grn:#3DB565;--grn-bg:#15301E;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--card)}
+[hidden]{display:none!important}
+
+/* Cabeçalho */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;height:56px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:10px}
+.brand{font-weight:800;letter-spacing:.08em;font-size:17px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--accent);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,115,12,.55)}70%{box-shadow:0 0 0 10px rgba(232,115,12,0)}100%{box-shadow:0 0 0 0 rgba(232,115,12,0)}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.hdr-r{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);min-width:0}
+#hdrDate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hdrDate::first-letter{text-transform:uppercase}
+
+/* Navegação: fundo no telemóvel, topo no computador */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{position:relative;flex:1;min-height:60px;border:0;background:none;color:var(--muted);font-size:12px;font-weight:700;padding:0 2px}
+.tabs button.on{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.tabs .badge{position:absolute;top:6px;right:4px;min-width:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;line-height:18px}
+
+/* Formulários */
+select,input,textarea{font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:46px;width:100%}
+textarea{min-height:88px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hdr-r select{width:auto;min-height:38px;padding:6px 10px;font-weight:700}
+label{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:4px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}
+.btn{min-height:48px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.wide{width:100%}
+.armed{background:var(--red)!important;border-color:var(--red)!important;color:#fff!important}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.btnrow .btn{flex:1 1 140px}
+
+/* Estrutura */
+main{max-width:1140px;margin:0 auto;padding:16px 14px 100px}
+.view{display:none}.view.on{display:block}
+h2{font-size:15px;font-weight:800;margin:24px 2px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2:first-child{margin-top:4px}
+h2 small{font-weight:600;color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.empty{color:var(--muted);text-align:center;padding:18px;font-size:14px;border:1px dashed var(--line);border-radius:12px;background:var(--card)}
+.hint{color:var(--muted);font-size:13px;margin:8px 2px 0}
+
+/* Pulse board */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{border:1px solid var(--line);border-top:5px solid var(--line);border-radius:14px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-height:108px;background:var(--card);color:var(--text)}
+.kpi .n{font-size:38px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.25}
+.k-urg{border-top-color:var(--red)}.k-urg .n{color:var(--red)}
+.k-agd{border-top-color:var(--accent)}
+.k-rea{border-top-color:var(--amb)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--muted);min-height:52px;text-align:left}
+.stat b{font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
+.stat.alert b{color:var(--red)}
+.stat.ok b{color:var(--grn)}
+.ctrs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctr{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.ctr .cl{font-size:13px;font-weight:700;color:var(--muted)}
+.cb{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.pm{width:50px;height:50px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--text);font-size:26px;font-weight:700;line-height:1}
+.pm.plus{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.cn{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+.warn{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:14px;font-weight:600}
+.warn .btn{min-height:42px;flex:0 0 auto}
+
+/* Matriz de prioridades — colunas lado a lado, deslizar na horizontal */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
+.chip{white-space:nowrap;min-height:42px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:13.5px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--muted);margin:0 0 12px;min-height:40px}
+.toggle input{width:22px;height:22px;min-height:0;accent-color:var(--accent)}
+.matrix{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.col{flex:0 0 88%;scroll-snap-align:start;min-width:0}
+.colh{padding:11px 14px;border-radius:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:10px}
+.colh.c-alta{background:var(--red)}.colh.c-media{background:var(--amb)}.colh.c-baixa{background:var(--grn)}
+.colh span{background:rgba(255,255,255,.25);border-radius:99px;padding:1px 10px}
+.task{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.task.p-alta{border-left-color:var(--red)}.task.p-media{border-left-color:var(--amb)}.task.p-baixa{border-left-color:var(--grn)}
+.task.done{opacity:.55}.task.done .tt{text-decoration:line-through}
+.task.curso{background:linear-gradient(var(--accent-soft),var(--accent-soft)) left top/100% 3px no-repeat,var(--card)}
+.tt{font-weight:700;font-size:15.5px;word-break:break-word}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;font-size:12.5px;color:var(--muted)}
+.meta span{background:var(--soft);padding:2px 9px;border-radius:999px;font-weight:600}
+.meta .f-urg{background:var(--red-bg);color:var(--red)}
+.meta .s-curso{background:var(--accent-soft);color:var(--accent)}
+.meta .late{background:var(--red);color:#fff}
+.note{font-size:13.5px;margin-top:7px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.acts button{min-height:42px;padding:6px 13px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:13.5px}
+.acts .go{background:var(--grn);border-color:var(--grn);color:#fff}
+.acts .del{color:var(--red)}
+
+/* Ocorrências */
+.occ{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--amb);border-radius:12px;padding:12px;margin-bottom:10px}
+.occ.res{border-left-color:var(--grn);opacity:.7}
+.occ .oh{display:flex;justify-content:space-between;gap:8px;font-weight:700}
+.occ .ot{color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap}
+.occ .od{margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px}
+.pill.open{background:var(--amb-bg);color:var(--amb)}
+.pill.ok{background:var(--grn-bg);color:var(--grn)}
+
+/* Passagem de turno */
+.pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0;max-height:60vh;overflow:auto}
+.hist{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.hist summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;justify-content:space-between;min-height:48px;align-items:center}
+.hist summary::-webkit-details-marker{display:none}
+.hist .pre{border:0;border-top:1px solid var(--line);border-radius:0}
+.hist .acts{padding:0 14px 12px}
+
+/* Guião */
+.seg{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px;margin-bottom:14px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:9px;background:none;font-weight:700;color:var(--muted);font-size:14px}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.clhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.clhead .btn{min-height:40px;padding:6px 14px;font-size:13.5px}
+.bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:10px 0 14px}
+.bar i{display:block;height:100%;width:0;background:var(--grn);border-radius:99px;transition:width .3s}
+.clrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);margin-bottom:8px;font-size:15px}
+.clrow .box{flex:0 0 30px;height:30px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font-weight:900;color:#fff;font-size:17px}
+.clrow.ok{color:var(--muted)}
+.clrow.ok .box{background:var(--grn);border-color:var(--grn)}
+.clrow.edit span{flex:1}
+.clrow.edit button{min-height:40px;padding:6px 12px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--red);font-weight:700}
+.addrow{display:flex;gap:8px;margin-bottom:8px}
+.addrow .btn{flex:0 0 auto}
+
+/* Tabela no estilo CNVs */
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--accent);color:var(--on-accent);text-align:left;padding:11px 12px;font-weight:800;white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}
+tbody tr:nth-child(even) td{background:var(--soft)}
+td a{color:var(--accent);font-weight:800;text-decoration:none;display:inline-block;padding:6px 0;font-variant-numeric:tabular-nums}
+td .del{min-height:38px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--red);font-weight:700}
+.proc{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.proc summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;min-height:50px;display:flex;align-items:center}
+.proc summary::-webkit-details-marker{display:none}
+.proc .pb{padding:0 14px 12px;white-space:pre-wrap;word-break:break-word}
+.proc .acts{padding:0 14px 12px;margin-top:0}
+
+/* Dados */
+.dl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px}
+.dl span{color:var(--muted)}
+.dl b{text-align:right;font-variant-numeric:tabular-nums}
+.file-btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#printArea{display:none}
+
+@media (min-width:900px){
+  .tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center;padding:0}
+  .tabs button{flex:0 0 auto;padding:0 22px;font-size:14px;min-height:50px}
+  .tabs button.on{box-shadow:inset 0 -3px 0 var(--accent)}
+  main{padding:22px 24px 48px}
+  .kpi{min-height:128px;padding:16px}
+  .kpi .n{font-size:48px}
+  .kpi .l{font-size:14px}
+  .stats,.ctrs{grid-template-columns:repeat(4,1fr)}
+  .fgrid{grid-template-columns:repeat(4,1fr)}
+  .col{flex:1 1 0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  #toast{bottom:32px}
+}
+@media print{
+  body::before{display:none}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block}
+  #printArea pre{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="dot" aria-hidden="true"></span>CG PULSE</div>
+  <div class="hdr-r">
+    <span id="hdrDate"></span>
+    <select id="shiftSel" aria-label="Turno"></select>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs" aria-label="Secções">
+  <button data-act="nav" data-v="pulse" class="on">Pulse</button>
+  <button data-act="nav" data-v="tasks">Tarefas</button>
+  <button data-act="nav" data-v="occ">Ocorrências<span class="badge" id="navOcc" hidden></span></button>
+  <button data-act="nav" data-v="hand">Turno</button>
+  <button data-act="nav" data-v="guia">Guião</button>
+  <button data-act="nav" data-v="data">Dados</button>
+</nav>
+
+<main>
+
+<!-- 1. PULSE BOARD -->
+<section id="v-pulse" class="view on">
+  <h2>Prioridades do dia</h2>
+  <div class="kpis">
+    <button class="kpi k-urg" data-act="goFlow" data-f="urg"><span class="n" id="kUrg">0</span><span class="l">Urgentes e internamento</span></button>
+    <button class="kpi k-agd" data-act="goFlow" data-f="agd"><span class="n" id="kAgd">0</span><span class="l">Exames agendados</span></button>
+    <button class="kpi k-rea" data-act="goFlow" data-f="rea"><span class="n" id="kRea">0</span><span class="l">Reagendamentos pendentes</span></button>
+  </div>
+  <div class="stats">
+    <button class="stat" id="stHigh" data-act="nav" data-v="tasks"><span>Prioridade alta</span><b id="sHigh">0</b></button>
+    <button class="stat" id="stLate" data-act="nav" data-v="tasks"><span>Atrasadas</span><b id="sLate">0</b></button>
+    <button class="stat" id="stOcc" data-act="nav" data-v="occ"><span>Ocorrências abertas</span><b id="sOcc">0</b></button>
+    <button class="stat" id="stCl" data-act="nav" data-v="guia"><span>Checklist</span><b id="sCl">0/0</b></button>
+  </div>
+  <div id="bkWarn"></div>
+
+  <h2>Fluxo do dia <small id="ctrDate"></small></h2>
+  <div class="ctrs" id="ctrs"></div>
+
+  <h2>Prioridade alta em aberto</h2>
+  <div id="pulseHigh"></div>
+</section>
+
+<!-- 2. TAREFAS -->
+<section id="v-tasks" class="view">
+  <h2 id="tFormTitle">Nova tarefa</h2>
+  <div class="card" id="taskForm">
+    <div class="fgrid">
+      <div class="full"><label for="tTitle">Tarefa</label><input id="tTitle" autocomplete="off" placeholder="Ex.: Confirmar preparação TAC abdominal 10:30 (use iniciais)"></div>
+      <div><label for="tPri">Prioridade</label><select id="tPri"></select></div>
+      <div><label for="tFlow">Fluxo</label><select id="tFlow"></select></div>
+      <div><label for="tCat">Categoria</label><select id="tCat"></select></div>
+      <div><label for="tDue">Hora limite</label><input id="tDue" type="time"></div>
+      <div class="full"><label for="tNote">Nota (opcional)</label><input id="tNote" autocomplete="off" placeholder="Detalhe curto"></div>
+    </div>
+    <div class="btnrow" style="margin-bottom:0">
+      <button class="btn pri" id="tSubmit" data-act="tSave">Adicionar tarefa</button>
+      <button class="btn" id="tCancel" data-act="tCancel" hidden>Cancelar edição</button>
+    </div>
+  </div>
+
+  <h2>Matriz de prioridades <small id="tCount"></small></h2>
+  <div class="chips" id="taskFilter"></div>
+  <label class="toggle"><input type="checkbox" id="showDone"> Mostrar concluídas</label>
+  <div class="matrix" id="matrix"></div>
+  <div class="btnrow"><button class="btn" data-act="tClearDone">Limpar tarefas concluídas</button></div>
+</section>
+
+<!-- 3. OCORRÊNCIAS -->
+<section id="v-occ" class="view">
+  <div class="two">
+    <div>
+      <h2>Registar ocorrência</h2>
+      <div class="card">
+        <div class="fgrid" style="grid-template-columns:1fr 1fr">
+          <div><label for="oType">Tipo</label><select id="oType"></select></div>
+          <div><label for="oTime">Hora</label><input id="oTime" type="time"></div>
+          <div class="full"><label for="oDesc">O que aconteceu</label><textarea id="oDesc" placeholder="Ex.: TAC 2 parado das 9:40 às 10:20 — 3 exames remarcados"></textarea></div>
+        </div>
+        <div class="btnrow" style="margin-bottom:0"><button class="btn pri wide" data-act="oAdd">Registar ocorrência</button></div>
+      </div>
+    </div>
+    <div>
+      <h2>Ocorrências</h2>
+      <div class="seg" id="occSeg">
+        <button data-act="oFilter" data-f="open" class="on">Em aberto</button>
+        <button data-act="oFilter" data-f="today">Hoje</button>
+        <button data-act="oFilter" data-f="all">Todas</button>
+      </div>
+      <div id="occList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. PASSAGEM DE TURNO -->
+<section id="v-hand" class="view">
+  <div class="two">
+    <div>
+      <h2>Notas para o próximo turno</h2>
+      <textarea id="handNote" placeholder="Pendentes, recados, o que o turno seguinte precisa de saber…"></textarea>
+      <div class="btnrow">
+        <button class="btn pri" data-act="hCopy">Copiar resumo</button>
+        <button class="btn" data-act="hSave">Guardar no histórico</button>
+        <button class="btn" data-act="hPrint">Imprimir</button>
+        <button class="btn" data-act="hTxt">Descarregar .txt</button>
+      </div>
+      <p class="hint">O resumo é gerado automaticamente com as tarefas, ocorrências, contadores e checklist do dia. Ao guardar no histórico, as notas são limpas para o turno seguinte.</p>
+    </div>
+    <div>
+      <h2>Pré-visualização</h2>
+      <pre class="pre" id="handPrev"></pre>
+    </div>
+  </div>
+  <h2>Histórico de passagens <small id="histCount"></small></h2>
+  <div id="histList"></div>
+</section>
+
+<!-- 5. GUIÃO -->
+<section id="v-guia" class="view">
+  <div class="seg" id="guiaSeg">
+    <button data-act="gTab" data-g="check" class="on">Checklist</button>
+    <button data-act="gTab" data-g="cont">Contactos</button>
+    <button data-act="gTab" data-g="proc">Procedimentos</button>
+  </div>
+
+  <div id="g-check">
+    <div class="seg" id="clSeg">
+      <button data-act="clMode" data-m="abertura" class="on">Abertura</button>
+      <button data-act="clMode" data-m="fecho">Fecho</button>
+    </div>
+    <div class="clhead"><b id="clCount"></b><button class="btn" data-act="clEditT" id="clEditBtn">Editar lista</button></div>
+    <div class="bar"><i id="clBar"></i></div>
+    <div class="addrow" id="clAddRow" hidden><input id="clNew" placeholder="Novo item da checklist" autocomplete="off"><button class="btn pri" data-act="clAdd">Adicionar</button></div>
+    <div id="clList"></div>
+    <div class="btnrow"><button class="btn" data-act="clReset">Desmarcar tudo hoje</button></div>
+    <p class="hint">A checklist recomeça sozinha a cada novo dia.</p>
+  </div>
+
+  <div id="g-cont" hidden>
+    <div class="card">
+      <div class="fgrid">
+        <div><label for="cName">Nome / função</label><input id="cName" autocomplete="off" placeholder="Ex.: Enf.ª chefe"></div>
+        <div><label for="cSvc">Serviço</label><input id="cSvc" autocomplete="off" placeholder="Ex.: Urgência"></div>
+        <div><label for="cExt">Extensão / telefone</label><input id="cExt" inputmode="tel" autocomplete="off" placeholder="Ex.: 4521"></div>
+        <div style="display:flex;align-items:flex-end"><button class="btn pri wide" data-act="cAdd">Adicionar contacto</button></div>
+      </div>
+    </div>
+    <h2>Contactos internos <small id="cCount"></small></h2>
+    <input id="cSearch" type="search" placeholder="Procurar por nome, serviço ou extensão" autocomplete="off" style="margin-bottom:10px">
+    <div id="cList"></div>
+  </div>
+
+  <div id="g-proc" hidden>
+    <div class="card">
+      <label for="pTitle">Procedimento</label>
+      <input id="pTitle" autocomplete="off" placeholder="Ex.: Marcação de RM com contraste" style="margin-bottom:10px">
+      <label for="pBody">Passos / notas</label>
+      <textarea id="pBody" placeholder="Passos, documentos necessários, contactos…"></textarea>
+      <div class="btnrow" style="margin-bottom:0"><button class="btn pri wide" data-act="pAdd" id="pSubmit">Guardar procedimento</button></div>
+    </div>
+    <h2>Procedimentos frequentes <small id="pCount"></small></h2>
+    <input id="pSearch" type="search" placeholder="Procurar procedimento" autocomplete="off" style="margin-bottom:10px">
+    <div id="pList"></div>
+  </div>
+</section>
+
+<!-- 6. DADOS -->
+<section id="v-data" class="view">
+  <div class="two">
+    <div>
+      <h2>Cópia de segurança</h2>
+      <div class="card">
+        <div class="dl" id="dataStats"></div>
+        <div class="btnrow">
+          <button class="btn pri" data-act="dExport">Exportar backup (.json)</button>
+          <button class="btn" data-act="dCopy">Copiar backup</button>
+          <label class="btn file-btn" style="margin:0;color:var(--text);font-size:15px">Importar ficheiro<input type="file" id="dFile" accept=".json,application/json"></label>
+        </div>
+        <p class="hint">Importar substitui todos os dados atuais deste dispositivo pelos do ficheiro.</p>
+      </div>
+      <h2>Importar por texto</h2>
+      <div class="card">
+        <textarea id="dPaste" placeholder="Cole aqui o conteúdo de um backup copiado"></textarea>
+        <div class="btnrow" style="margin-bottom:0"><button class="btn wide" data-act="dPasteImp">Importar texto colado</button></div>
+      </div>
+    </div>
+    <div>
+      <h2>Privacidade</h2>
+      <div class="card">
+        <p style="margin:0 0 10px">Tudo o que regista fica guardado apenas neste navegador, neste dispositivo. Nada é enviado para servidores. A app funciona sem internet depois da primeira abertura.</p>
+        <p style="margin:0 0 10px">Se limpar os dados do navegador, perde os registos — por isso, exporte um backup no fim de cada turno.</p>
+        <p style="margin:0">Boa prática: use iniciais ou o número interno em vez do nome completo do utente.</p>
+      </div>
+      <h2>Zona de risco</h2>
+      <div class="card">
+        <button class="btn wide" style="color:var(--red)" data-act="dWipe">Apagar todos os dados deste dispositivo</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="printArea"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='cgpulse_v1';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)};
+var pad=function(n){return String(n).padStart(2,'0')};
+var dkey=function(d){d=d||new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+var hm=function(d){d=d||new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+var fmtD=function(k){var p=k.split('-');return p[2]+'/'+p[1]+'/'+p[0]};
+var tsKey=function(ts){return dkey(new Date(ts))};
+
+var PRI={alta:'Alta',media:'Média',baixa:'Baixa'};
+var FLOWS={urg:'Urgente / internamento',agd:'Exame agendado',rea:'Reagendamento pendente',ger:'Geral'};
+var FLOW_S={urg:'Urgente',agd:'Agendado',rea:'Reagendar',ger:'Geral'};
+var CATS=['Preparação','Consentimento informado','Quotas / vagas','Contacto com utente','Requisições / credenciais','Administrativo','Outro'];
+var STAT={pend:'Pendente',curso:'Em curso',feito:'Concluída'};
+var OCC_T=['Avaria de equipamento','Atraso de bloco / sala','Vaga de urgência utilizada','Falta de utente','Sistema informático','Utente / reclamação','Outro'];
+var COUNTERS=[{k:'atend',l:'Utentes atendidos'},{k:'falta',l:'Faltas'},{k:'urgx',l:'Urgências extra'},{k:'remc',l:'Remarcações feitas'}];
+var SHIFTS=['Manhã','Tarde','Noite'];
+
+function defaults(){
+  return{v:1,shift:'',shiftDate:'',tasks:[],occ:[],counters:{},
+    checklist:{
+      abertura:['Ligar postos e abrir sistemas (RIS/PACS, agenda)','Ler a passagem de turno anterior','Consultar agenda do dia e vagas de urgência','Verificar preparações dos exames da manhã','Confirmar consentimentos em falta','Verificar impressora de etiquetas e pulseiras'].map(function(t){return{id:uid(),t:t}}),
+      fecho:['Registar pendentes na passagem de turno','Confirmar remarcações feitas no dia','Arquivar consentimentos e requisições','Atualizar quotas / vagas do dia seguinte','Exportar backup do CG PULSE','Fechar sessões e desligar postos'].map(function(t){return{id:uid(),t:t}})
+    },
+    checks:{},contacts:[],procs:[],handovers:[],handNote:'',lastBackup:0};
+}
+function normalize(p){
+  var d=defaults();
+  if(!p||typeof p!=='object')return d;
+  var s=Object.assign(d,p);
+  ['tasks','occ','contacts','procs','handovers'].forEach(function(k){if(!Array.isArray(s[k]))s[k]=[]});
+  if(!s.checklist||typeof s.checklist!=='object')s.checklist=defaults().checklist;
+  if(!Array.isArray(s.checklist.abertura))s.checklist.abertura=[];
+  if(!Array.isArray(s.checklist.fecho))s.checklist.fecho=[];
+  if(!s.checks||typeof s.checks!=='object')s.checks={};
+  if(!s.counters||typeof s.counters!=='object')s.counters={};
+  if(typeof s.handNote!=='string')s.handNote='';
+  return s;
+}
+function load(){try{var raw=localStorage.getItem(KEY);if(raw)return normalize(JSON.parse(raw))}catch(e){}return defaults()}
+var storageOK=true;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOK=true}catch(e){if(storageOK)toast('Atenção: este navegador não está a guardar os dados');storageOK=false}}
+
+var S=load();
+var ui={view:'pulse',taskFilter:'all',showDone:false,editing:null,occFilter:'open',guia:'check',clMode:'abertura',clEdit:false,cSearch:'',pSearch:''};
+
+/* ---------- utilitários ---------- */
+var toastT;
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show')},2200)}
+function arm(b){
+  if(b.dataset.armed==='1')return true;
+  b.dataset.armed='1';var old=b.textContent;b.textContent='Confirmar?';b.classList.add('armed');
+  setTimeout(function(){if(b.isConnected&&b.dataset.armed==='1'){b.dataset.armed='';b.textContent=old;b.classList.remove('armed')}},3000);
+  return false;
+}
+function copyText(txt,msg){
+  function fallback(){var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='0';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();toast(ok?msg:'Não foi possível copiar — selecione o texto manualmente')}
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(function(){toast(msg)},fallback);return}}catch(e){}
+  fallback();
+}
+function download(name,text,type){
+  try{var blob=new Blob([text],{type:type});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove()},1500);return true}catch(e){return false}
+}
+function curShift(){
+  if(S.shiftDate===dkey()&&S.shift)return S.shift;
+  var h=new Date().getHours();return h>=7&&h<14?'Manhã':(h>=14&&h<21?'Tarde':'Noite');
+}
+function openTasks(){return S.tasks.filter(function(t){return t.status!=='feito'})}
+function isLate(t){return !!t.due&&t.status!=='feito'&&t.due<hm()}
+function rank(x){return x.status==='curso'?0:x.status==='pend'?1:2}
+function sortT(a,b){
+  if(rank(a)!==rank(b))return rank(a)-rank(b);
+  var da=a.due||'99:99',db=b.due||'99:99';if(da!==db)return da<db?-1:1;
+  return a.created-b.created;
+}
+function todayChecks(){return S.checks[dkey()]||{}}
+function clProgress(m){var it=S.checklist[m],ch=todayChecks();return{ok:it.filter(function(i){return ch[i.id]}).length,total:it.length}}
+
+/* ---------- render ---------- */
+function renderHeader(){
+  $('#hdrDate').textContent=new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'short'});
+  var sel=$('#shiftSel'),cs=curShift();
+  if(!sel.options.length)sel.innerHTML=SHIFTS.map(function(s){return'<option>'+s+'</option>'}).join('');
+  sel.value=cs;
+  var n=S.occ.filter(function(o){return o.status==='aberta'}).length,b=$('#navOcc');
+  b.hidden=!n;b.textContent=n;
+}
+
+function taskCard(t){
+  var late=isLate(t),id=esc(t.id),acts='';
+  if(t.status==='feito'){acts='<button data-act="tReopen" data-id="'+id+'">Reabrir</button>'}
+  else{
+    acts=(t.status==='pend'?'<button data-act="tStart" data-id="'+id+'">Iniciar</button>':'<button data-act="tPause" data-id="'+id+'">Pausar</button>')+
+      '<button class="go" data-act="tDone" data-id="'+id+'">Concluir</button>';
+  }
+  acts+='<button data-act="tEdit" data-id="'+id+'">Editar</button><button class="del" data-act="tDel" data-id="'+id+'">Apagar</button>';
+  return '<div class="task p-'+t.pri+(t.status==='feito'?' done':'')+(t.status==='curso'?' curso':'')+'">'+
+    '<div class="tt">'+esc(t.t)+'</div>'+
+    '<div class="meta"><span class="f-'+t.flow+'">'+FLOW_S[t.flow]+'</span>'+
+      (t.cat?'<span>'+esc(t.cat)+'</span>':'')+
+      (t.due?'<span>até '+esc(t.due)+'</span>':'')+
+      '<span class="s-'+t.status+'">'+STAT[t.status]+'</span>'+
+      (late?'<span class="late">Atrasada</span>':'')+'</div>'+
+    (t.note?'<div class="note">'+esc(t.note)+'</div>':'')+
+    '<div class="acts">'+acts+'</div></div>';
+}
+
+function renderPulse(){
+  var op=openTasks();
+  var cnt=function(f){return op.filter(function(t){return t.flow===f}).length};
+  $('#kUrg').textContent=cnt('urg');$('#kAgd').textContent=cnt('agd');$('#kRea').textContent=cnt('rea');
+  var high=op.filter(function(t){return t.pri==='alta'}),late=op.filter(isLate);
+  var oo=S.occ.filter(function(o){return o.status==='aberta'}).length;
+  $('#sHigh').textContent=high.length;$('#stHigh').classList.toggle('alert',high.length>0);
+  $('#sLate').textContent=late.length;$('#stLate').classList.toggle('alert',late.length>0);
+  $('#sOcc').textContent=oo;$('#stOcc').classList.toggle('alert',oo>0);
+  var a=clProgress('abertura'),f=clProgress('fecho'),ok=a.ok+f.ok,tot=a.total+f.total;
+  $('#sCl').textContent=ok+'/'+tot;$('#stCl').classList.toggle('ok',tot>0&&ok===tot);
+
+  var c=S.counters[dkey()]||{};
+  $('#ctrDate').textContent=fmtD(dkey());
+  $('#ctrs').innerHTML=COUNTERS.map(function(x){
+    return '<div class="ctr"><div class="cl">'+x.l+'</div><div class="cb">'+
+      '<button class="pm" data-act="cInc" data-k="'+x.k+'" data-d="-1" aria-label="Menos '+x.l+'">−</button>'+
+      '<span class="cn">'+(c[x.k]||0)+'</span>'+
+      '<button class="pm plus" data-act="cInc" data-k="'+x.k+'" data-d="1" aria-label="Mais '+x.l+'">+</button></div></div>';
+  }).join('');
+
+  $('#pulseHigh').innerHTML=high.length?high.sort(sortT).slice(0,8).map(taskCard).join(''):'<div class="empty">Sem tarefas de prioridade alta em aberto.</div>';
+
+  var hasData=S.tasks.length||S.occ.length||S.contacts.length||S.procs.length||S.handovers.length;
+  var stale=!S.lastBackup||(Date.now()-S.lastBackup>24*3600e3);
+  $('#bkWarn').innerHTML=(hasData&&stale)?'<div class="warn"><span>'+(S.lastBackup?'O último backup tem mais de 24 h.':'Ainda não exportou nenhum backup.')+'</span><button class="btn pri" data-act="dExport">Exportar</button></div>':'';
+}
+
+function renderTasks(){
+  var F=[['all','Todas'],['urg','Urgentes'],['agd','Agendados'],['rea','Reagendamentos'],['ger','Geral']];
+  $('#taskFilter').innerHTML=F.map(function(f){
+    var n=openTasks().filter(function(t){return f[0]==='all'||t.flow===f[0]}).length;
+    return '<button class="chip'+(ui.taskFilter===f[0]?' on':'')+'" data-act="tFilter" data-f="'+f[0]+'">'+f[1]+' ('+n+')</button>';
+  }).join('');
+  $('#showDone').checked=ui.showDone;
+  var list=S.tasks.filter(function(t){return(ui.taskFilter==='all'||t.flow===ui.taskFilter)&&(ui.showDone||t.status!=='feito')});
+  $('#tCount').textContent=openTasks().length+' em aberto';
+  $('#matrix').innerHTML=['alta','media','baixa'].map(function(p){
+    var items=list.filter(function(t){return t.pri===p}).sort(sortT);
+    return '<div class="col"><div class="colh c-'+p+'">'+PRI[p]+' <span>'+items.length+'</span></div>'+
+      (items.length?items.map(taskCard).join(''):'<div class="empty">Sem tarefas</div>')+'</div>';
+  }).join('');
+}
+
+function renderOcc(){
+  [].forEach.call(document.querySelectorAll('#occSeg button'),function(b){b.classList.toggle('on',b.dataset.f===ui.occFilter)});
+  var k=dkey();
+  var list=S.occ.filter(function(o){return ui.occFilter==='all'||(ui.occFilter==='open'?o.status==='aberta':o.date===k)});
+  $('#occList').innerHTML=list.length?list.map(function(o){
+    var id=esc(o.id),res=o.status==='resolvida';
+    return '<div class="occ'+(res?' res':'')+'"><div class="oh"><span>'+esc(o.type)+'</span><span class="ot">'+(o.date!==k?fmtD(o.date)+', ':'')+esc(o.time)+'</span></div>'+
+      '<div class="od">'+esc(o.desc)+'</div>'+
+      '<div class="acts"><span class="pill '+(res?'ok':'open')+'">'+(res?'Resolvida':'Em aberto')+'</span></div>'+
+      '<div class="acts">'+(res?'<button data-act="oReopen" data-id="'+id+'">Reabrir</button>':'<button class="go" data-act="oRes" data-id="'+id+'">Marcar resolvida</button>')+
+      '<button class="del" data-act="oDel" data-id="'+id+'">Apagar</button></div></div>';
+  }).join(''):'<div class="empty">'+(ui.occFilter==='open'?'Sem ocorrências em aberto.':'Sem ocorrências registadas.')+'</div>';
+}
+
+function buildHand(){
+  var k=dkey(),L=[],rule='──────────────────────────────';
+  var op=openTasks(),c=S.counters[k]||{},ch=todayChecks();
+  var cnt=function(f){return op.filter(function(t){return t.flow===f}).length};
+  L.push('CG PULSE · PASSAGEM DE TURNO');
+  L.push('Data: '+fmtD(k)+'   Turno: '+curShift()+'   Hora: '+hm());
+  L.push(rule);
+  L.push('FLUXO DO DIA');
+  COUNTERS.forEach(function(x){L.push('• '+x.l+': '+(c[x.k]||0))});
+  L.push('');L.push('PRIORIDADES EM ABERTO');
+  L.push('• Urgentes / internamento: '+cnt('urg'));
+  L.push('• Exames agendados: '+cnt('agd'));
+  L.push('• Reagendamentos pendentes: '+cnt('rea'));
+  L.push('');L.push('TAREFAS PENDENTES ('+op.length+')');
+  if(!op.length)L.push('• Nenhuma');
+  ['alta','media','baixa'].forEach(function(p){
+    op.filter(function(t){return t.pri===p}).sort(sortT).forEach(function(t){
+      L.push('• ['+PRI[p].toUpperCase()+'] '+t.t+(t.due?' (até '+t.due+')':'')+' — '+STAT[t.status]+', '+FLOW_S[t.flow]+(isLate(t)?', ATRASADA':''));
+      if(t.note)L.push('   ↳ '+t.note);
+    });
+  });
+  var doneT=S.tasks.filter(function(t){return t.status==='feito'&&t.doneAt&&tsKey(t.doneAt)===k});
+  L.push('');L.push('CONCLUÍDAS HOJE ('+doneT.length+')');
+  if(!doneT.length)L.push('• Nenhuma');
+  doneT.forEach(function(t){L.push('• '+t.t)});
+  var oo=S.occ.filter(function(o){return o.status==='aberta'});
+  L.push('');L.push('OCORRÊNCIAS EM ABERTO ('+oo.length+')');
+  if(!oo.length)L.push('• Nenhuma');
+  oo.forEach(function(o){L.push('• '+(o.date!==k?fmtD(o.date)+' ':'')+o.time+' | '+o.type+': '+o.desc)});
+  var orr=S.occ.filter(function(o){return o.status==='resolvida'&&o.resolvedAt&&tsKey(o.resolvedAt)===k});
+  if(orr.length){L.push('');L.push('OCORRÊNCIAS RESOLVIDAS HOJE ('+orr.length+')');orr.forEach(function(o){L.push('• '+o.time+' | '+o.type+': '+o.desc)})}
+  L.push('');L.push('CHECKLIST');
+  ['abertura','fecho'].forEach(function(m){
+    var it=S.checklist[m],ok=it.filter(function(i){return ch[i.id]}).length;
+    L.push('• '+(m==='abertura'?'Abertura':'Fecho')+': '+ok+'/'+it.length);
+    it.filter(function(i){return !ch[i.id]}).forEach(function(i){L.push('   ✗ '+i.t)});
+  });
+  L.push('');L.push('NOTAS PARA O PRÓXIMO TURNO');
+  L.push((S.handNote||'').trim()||'—');
+  L.push(rule);
+  return L.join('\n');
+}
+
+function renderHand(){
+  $('#handPrev').textContent=buildHand();
+  $('#histCount').textContent=S.handovers.length?S.handovers.length+' guardadas':'';
+  $('#histList').innerHTML=S.handovers.length?S.handovers.map(function(h){
+    var id=esc(h.id);
+    return '<details class="hist"><summary><span>'+fmtD(h.date)+', '+esc(h.time)+'</span><span style="color:var(--muted)">'+esc(h.shift)+'</span></summary>'+
+      '<pre class="pre">'+esc(h.text)+'</pre><div class="acts"><button data-act="hItemCopy" data-id="'+id+'">Copiar</button><button class="del" data-act="hItemDel" data-id="'+id+'">Apagar</button></div></details>';
+  }).join(''):'<div class="empty">Ainda não guardou nenhuma passagem de turno.</div>';
+}
+
+function renderGuia(){
+  [].forEach.call(document.querySelectorAll('#guiaSeg button'),function(b){b.classList.toggle('on',b.dataset.g===ui.guia)});
+  $('#g-check').hidden=ui.guia!=='check';$('#g-cont').hidden=ui.guia!=='cont';$('#g-proc').hidden=ui.guia!=='proc';
+
+  [].forEach.call(document.querySelectorAll('#clSeg button'),function(b){
+    var p=clProgress(b.dataset.m);b.classList.toggle('on',b.dataset.m===ui.clMode);
+    b.textContent=(b.dataset.m==='abertura'?'Abertura':'Fecho')+' '+p.ok+'/'+p.total;
+  });
+  var items=S.checklist[ui.clMode],ch=todayChecks(),p=clProgress(ui.clMode);
+  $('#clCount').textContent=p.ok+' de '+p.total+' feitos';
+  $('#clBar').style.width=(p.total?Math.round(p.ok/p.total*100):0)+'%';
+  $('#clEditBtn').textContent=ui.clEdit?'Concluir edição':'Editar lista';
+  $('#clAddRow').hidden=!ui.clEdit;
+  $('#clList').innerHTML=items.length?items.map(function(i){
+    var id=esc(i.id);
+    return ui.clEdit?'<div class="clrow edit"><span>'+esc(i.t)+'</span><button data-act="clDel" data-id="'+id+'">Remover</button></div>'
+      :'<button class="clrow'+(ch[i.id]?' ok':'')+'" data-act="clTog" data-id="'+id+'"><span class="box">'+(ch[i.id]?'✓':'')+'</span><span>'+esc(i.t)+'</span></button>';
+  }).join(''):'<div class="empty">Lista vazia. Toque em «Editar lista» para adicionar itens.</div>';
+
+  renderContacts();renderProcs();
+}
+function renderContacts(){
+  var q=ui.cSearch.trim().toLowerCase();
+  var list=S.contacts.filter(function(c){return !q||(c.name+' '+c.svc+' '+c.ext).toLowerCase().indexOf(q)>-1})
+    .sort(function(a,b){return(a.svc||'').localeCompare(b.svc||'','pt')||a.name.localeCompare(b.name,'pt')});
+  $('#cCount').textContent=S.contacts.length||'';
+  $('#cList').innerHTML=list.length?'<div class="tbl-wrap"><table><thead><tr><th>Nome / função</th><th>Serviço</th><th>Ext. / tel.</th><th></th></tr></thead><tbody>'+
+    list.map(function(c){
+      var tel=String(c.ext||'').replace(/[^\d+*#]/g,'');
+      return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.svc)+'</td><td>'+(tel?'<a href="tel:'+esc(tel)+'">'+esc(c.ext)+'</a>':esc(c.ext))+'</td><td><button class="del" data-act="cDel" data-id="'+esc(c.id)+'">Apagar</button></td></tr>';
+    }).join('')+'</tbody></table></div>'
+    :'<div class="empty">'+(S.contacts.length?'Nenhum contacto encontrado.':'Ainda sem contactos. Adicione as extensões que mais usa.')+'</div>';
+}
+function renderProcs(){
+  var q=ui.pSearch.trim().toLowerCase();
+  var list=S.procs.filter(function(p){return !q||(p.title+' '+p.body).toLowerCase().indexOf(q)>-1})
+    .sort(function(a,b){return a.title.localeCompare(b.title,'pt')});
+  $('#pCount').textContent=S.procs.length||'';
+  $('#pList').innerHTML=list.length?list.map(function(p){
+    var id=esc(p.id);
+    return '<details class="proc"><summary>'+esc(p.title)+'</summary><div class="pb">'+esc(p.body)+'</div>'+
+      '<div class="acts"><button data-act="pEdit" data-id="'+id+'">Editar</button><button data-act="pCopy" data-id="'+id+'">Copiar</button><button class="del" data-act="pDel" data-id="'+id+'">Apagar</button></div></details>';
+  }).join(''):'<div class="empty">'+(S.procs.length?'Nenhum procedimento encontrado.':'Ainda sem procedimentos. Guarde aqui os passos que consulta muitas vezes.')+'</div>';
+}
+
+function renderData(){
+  var raw='';try{raw=localStorage.getItem(KEY)||''}catch(e){}
+  var kb=(new Blob([raw]).size/1024).toFixed(1);
+  var rows=[['Tarefas',S.tasks.length],['Ocorrências',S.occ.length],['Contactos',S.contacts.length],['Procedimentos',S.procs.length],['Passagens de turno',S.handovers.length],['Espaço usado',kb+' KB'],['Último backup',S.lastBackup?new Date(S.lastBackup).toLocaleString('pt-PT',{dateStyle:'short',timeStyle:'short'}):'nunca']];
+  $('#dataStats').innerHTML=rows.map(function(r){return'<span>'+r[0]+'</span><b>'+esc(r[1])+'</b>'}).join('');
+}
+
+function renderAll(){renderHeader();renderPulse();renderTasks();renderOcc();renderHand();renderGuia();renderData()}
+
+function show(v){
+  ui.view=v;
+  [].forEach.call(document.querySelectorAll('.view'),function(s){s.classList.toggle('on',s.id==='v-'+v)});
+  [].forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('on',b.dataset.v===v)});
+  window.scrollTo(0,0);
+}
+
+/* ---------- ações ---------- */
+function findT(id){return S.tasks.find(function(t){return t.id===id})}
+function resetTaskForm(){
+  $('#tTitle').value='';$('#tDue').value='';$('#tNote').value='';
+  $('#tSubmit').textContent='Adicionar tarefa';$('#tCancel').hidden=true;$('#tFormTitle').textContent='Nova tarefa';ui.editing=null;
+}
+function taskSave(){
+  var title=$('#tTitle').value.trim();
+  if(!title){$('#tTitle').focus();toast('Escreva a tarefa primeiro');return}
+  var data={t:title,pri:$('#tPri').value,flow:$('#tFlow').value,cat:$('#tCat').value,due:$('#tDue').value,note:$('#tNote').value.trim()};
+  if(ui.editing){var x=findT(ui.editing);if(x)Object.assign(x,data);toast('Tarefa atualizada')}
+  else{S.tasks.push(Object.assign({id:uid(),status:'pend',created:Date.now(),doneAt:0},data));toast('Tarefa adicionada')}
+  resetTaskForm();save();renderAll();
+}
+function occAdd(){
+  var d=$('#oDesc').value.trim();
+  if(!d){$('#oDesc').focus();toast('Descreva a ocorrência primeiro');return}
+  S.occ.unshift({id:uid(),type:$('#oType').value,desc:d,time:$('#oTime').value||hm(),date:dkey(),status:'aberta',created:Date.now(),resolvedAt:0});
+  $('#oDesc').value='';$('#oTime').value='';save();renderAll();toast('Ocorrência registada');
+}
+var editingProc=null;
+function procSave(){
+  var t=$('#pTitle').value.trim(),b=$('#pBody').value.trim();
+  if(!t){$('#pTitle').focus();toast('Dê um nome ao procedimento');return}
+  if(editingProc){var p=S.procs.find(function(x){return x.id===editingProc});if(p){p.title=t;p.body=b}toast('Procedimento atualizado')}
+  else{S.procs.push({id:uid(),title:t,body:b});toast('Procedimento guardado')}
+  editingProc=null;$('#pTitle').value='';$('#pBody').value='';$('#pSubmit').textContent='Guardar procedimento';save();renderAll();
+}
+function importData(text){
+  var p;try{p=JSON.parse(text)}catch(e){toast('Ficheiro inválido: não é um backup JSON');return}
+  if(!p||typeof p!=='object'||!Array.isArray(p.tasks)){toast('Este ficheiro não é um backup do CG PULSE');return}
+  S=normalize(p);save();resetTaskForm();$('#handNote').value=S.handNote;renderAll();toast('Backup importado com sucesso');
+}
+function exportBackup(){
+  S.lastBackup=Date.now();save();
+  var ok=download('cg-pulse-backup-'+dkey()+'-'+hm().replace(':','h')+'.json',JSON.stringify(S,null,2),'application/json');
+  renderAll();toast(ok?'Backup exportado':'Use «Copiar backup» neste navegador');
+}
+
+var CONFIRM={tDel:1,tClearDone:1,oDel:1,hItemDel:1,clReset:1,cDel:1,pDel:1,dWipe:1};
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var a=b.dataset.act,id=b.dataset.id,t;
+  if(CONFIRM[a]&&!arm(b))return;
+  switch(a){
+    case 'nav':show(b.dataset.v);break;
+    case 'goFlow':ui.taskFilter=b.dataset.f;renderTasks();show('tasks');break;
+    case 'cInc':{var k=dkey();S.counters[k]=S.counters[k]||{};var v=(S.counters[k][b.dataset.k]||0)+Number(b.dataset.d);S.counters[k][b.dataset.k]=Math.max(0,v);save();renderPulse();renderHand();break}
+    case 'tSave':taskSave();break;
+    case 'tCancel':resetTaskForm();break;
+    case 'tFilter':ui.taskFilter=b.dataset.f;renderTasks();break;
+    case 'tStart':t=findT(id);if(t){t.status='curso';save();renderAll()}break;
+    case 'tPause':t=findT(id);if(t){t.status='pend';save();renderAll()}break;
+    case 'tDone':t=findT(id);if(t){t.status='feito';t.doneAt=Date.now();save();renderAll();toast('Tarefa concluída')}break;
+    case 'tReopen':t=findT(id);if(t){t.status='pend';t.doneAt=0;save();renderAll()}break;
+    case 'tEdit':t=findT(id);if(t){
+      ui.editing=id;$('#tTitle').value=t.t;$('#tPri').value=t.pri;$('#tFlow').value=t.flow;$('#tCat').value=t.cat||CATS[0];$('#tDue').value=t.due||'';$('#tNote').value=t.note||'';
+      $('#tSubmit').textContent='Guardar alterações';$('#tCancel').hidden=false;$('#tFormTitle').textContent='Editar tarefa';
+      show('tasks');$('#tTitle').focus();}break;
+    case 'tDel':S.tasks=S.tasks.filter(function(x){return x.id!==id});if(ui.editing===id)resetTaskForm();save();renderAll();toast('Tarefa apagada');break;
+    case 'tClearDone':{var n=S.tasks.length;S.tasks=S.tasks.filter(function(x){return x.status!=='feito'});save();renderAll();toast((n-S.tasks.length)+' tarefas concluídas removidas');break}
+    case 'oAdd':occAdd();break;
+    case 'oFilter':ui.occFilter=b.dataset.f;renderOcc();break;
+    case 'oRes':t=S.occ.find(function(o){return o.id===id});if(t){t.status='resolvida';t.resolvedAt=Date.now();save();renderAll();toast('Ocorrência resolvida')}break;
+    case 'oReopen':t=S.occ.find(function(o){return o.id===id});if(t){t.status='aberta';t.resolvedAt=0;save();renderAll()}break;
+    case 'oDel':S.occ=S.occ.filter(function(o){return o.id!==id});save();renderAll();toast('Ocorrência apagada');break;
+    case 'hCopy':copyText(buildHand(),'Resumo copiado');break;
+    case 'hSave':S.handovers.unshift({id:uid(),date:dkey(),time:hm(),shift:curShift(),text:buildHand()});S.handovers=S.handovers.slice(0,90);S.handNote='';$('#handNote').value='';save();renderAll();toast('Passagem de turno guardada');break;
+    case 'hPrint':$('#printArea').innerHTML='<pre>'+esc(buildHand())+'</pre>';try{window.print()}catch(err){toast('Impressão indisponível aqui — use «Copiar resumo»')}break;
+    case 'hTxt':toast(download('passagem-turno-'+dkey()+'-'+curShift()+'.txt',buildHand(),'text/plain;charset=utf-8')?'Ficheiro descarregado':'Use «Copiar resumo» neste navegador');break;
+    case 'hItemCopy':t=S.handovers.find(function(h){return h.id===id});if(t)copyText(t.text,'Passagem copiada');break;
+    case 'hItemDel':S.handovers=S.handovers.filter(function(h){return h.id!==id});save();renderHand();renderData();break;
+    case 'gTab':ui.guia=b.dataset.g;renderGuia();break;
+    case 'clMode':ui.clMode=b.dataset.m;renderGuia();break;
+    case 'clEditT':ui.clEdit=!ui.clEdit;renderGuia();if(ui.clEdit)$('#clNew').focus();break;
+    case 'clTog':{var k2=dkey(),ch=Object.assign({},todayChecks());S.checks={};S.checks[k2]=ch; /* guarda só o dia atual */if(ch[id])delete ch[id];else ch[id]=true;save();renderGuia();renderPulse();renderHand();break}
+    case 'clAdd':{var v2=$('#clNew').value.trim();if(!v2){$('#clNew').focus();break}S.checklist[ui.clMode].push({id:uid(),t:v2});$('#clNew').value='';save();renderGuia();renderPulse();renderHand();$('#clNew').focus();break}
+    case 'clDel':S.checklist[ui.clMode]=S.checklist[ui.clMode].filter(function(i){return i.id!==id});save();renderGuia();renderPulse();renderHand();break;
+    case 'clReset':{var ck=todayChecks();S.checklist[ui.clMode].forEach(function(i){delete ck[i.id]});S.checks={};S.checks[dkey()]=ck;save();renderAll();toast('Checklist desmarcada');break}
+    case 'cAdd':{var nm=$('#cName').value.trim(),ex=$('#cExt').value.trim();if(!nm&&!ex){$('#cName').focus();toast('Indique pelo menos o nome ou a extensão');break}
+      S.contacts.push({id:uid(),name:nm,svc:$('#cSvc').value.trim(),ext:ex});$('#cName').value='';$('#cSvc').value='';$('#cExt').value='';save();renderContacts();renderData();toast('Contacto adicionado');break}
+    case 'cDel':S.contacts=S.contacts.filter(function(c){return c.id!==id});save();renderContacts();renderData();break;
+    case 'pAdd':procSave();break;
+    case 'pEdit':t=S.procs.find(function(p){return p.id===id});if(t){editingProc=id;$('#pTitle').value=t.title;$('#pBody').value=t.body;$('#pSubmit').textContent='Guardar alterações';$('#pTitle').focus();window.scrollTo(0,0)}break;
+    case 'pCopy':t=S.procs.find(function(p){return p.id===id});if(t)copyText(t.title+'\n'+t.body,'Procedimento copiado');break;
+    case 'pDel':S.procs=S.procs.filter(function(p){return p.id!==id});save();renderProcs();renderData();break;
+    case 'dExport':exportBackup();break;
+    case 'dCopy':S.lastBackup=Date.now();save();copyText(JSON.stringify(S),'Backup copiado — cole-o num local seguro');renderAll();break;
+    case 'dPasteImp':{var tx=$('#dPaste').value.trim();if(!tx){toast('Cole primeiro o texto do backup');break}importData(tx);$('#dPaste').value='';break}
+    case 'dWipe':try{localStorage.removeItem(KEY)}catch(err){}S=defaults();save();resetTaskForm();$('#handNote').value='';renderAll();toast('Dados apagados');break;
+  }
+});
+
+/* ---------- inputs ---------- */
+function fill(sel,arr){$(sel).innerHTML=arr.map(function(o){return'<option value="'+esc(o[0])+'">'+esc(o[1])+'</option>'}).join('')}
+fill('#tPri',Object.keys(PRI).map(function(k){return[k,PRI[k]]}));$('#tPri').value='media';
+fill('#tFlow',Object.keys(FLOWS).map(function(k){return[k,FLOWS[k]]}));$('#tFlow').value='ger';
+fill('#tCat',CATS.map(function(c){return[c,c]}));
+fill('#oType',OCC_T.map(function(c){return[c,c]}));
+
+$('#tTitle').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();taskSave()}});
+$('#tNote').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();taskSave()}});
+$('#clNew').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('[data-act="clAdd"]').click()}});
+$('#showDone').addEventListener('change',function(e){ui.showDone=e.target.checked;renderTasks()});
+$('#handNote').value=S.handNote||'';
+$('#handNote').addEventListener('input',function(e){S.handNote=e.target.value;save();$('#handPrev').textContent=buildHand()});
+$('#cSearch').addEventListener('input',function(e){ui.cSearch=e.target.value;renderContacts()});
+$('#pSearch').addEventListener('input',function(e){ui.pSearch=e.target.value;renderProcs()});
+$('#shiftSel').addEventListener('change',function(e){S.shift=e.target.value;S.shiftDate=dkey();save();renderHand()});
+$('#dFile').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){importData(String(r.result))};r.onerror=function(){toast('Não foi possível ler o ficheiro')};r.readAsText(f);e.target.value='';
+});
+
+/* limpeza: só guarda contadores dos últimos 60 dias */
+(function(){var lim=dkey(new Date(Date.now()-60*864e5));Object.keys(S.counters).forEach(function(k){if(k<lim)delete S.counters[k]})})();
+
+renderAll();
+setInterval(renderAll,60000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)renderAll()});
+
+/* PWA: modo offline quando alojado (ex.: Netlify) */
+try{if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}}catch(e){}
+})();
+</script>
+</body>
+</html>
